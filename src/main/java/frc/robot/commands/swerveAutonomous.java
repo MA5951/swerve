@@ -8,15 +8,12 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.swerve.swerveDrivetrainSubsystem;
 
@@ -36,13 +33,10 @@ public class swerveAutonomous extends CommandBase {
         setKinematics(swerve.getKinematics());
     trajectory = TrajectoryGenerator.generateTrajectory(
       firstPose2d, list, endPose2d, trajectoryConfig);
-    PIDController xPID = new PIDController(1, 1, 1);
-    PIDController yPID = new PIDController(1, 1, 1);
-    ProfiledPIDController thetaProfiledPID = 
-      new ProfiledPIDController(1, 1, 1, 
-      new TrapezoidProfile.Constraints(swerveDrivetrainSubsystem.maxAngularVelocity, 
-      swerveDrivetrainSubsystem.maxAngularAcceleration));
-    driveController = new HolonomicDriveController(xPID, yPID, thetaProfiledPID);
+    driveController = new HolonomicDriveController(
+      swerveDrivetrainSubsystem.getInstance().P_CONTROLLER_X,
+      swerveDrivetrainSubsystem.getInstance().P_CONTROLLER_Y,
+      swerveDrivetrainSubsystem.getInstance().thetaProfiledPID);
   }
 
   // Called when the command is initially scheduled.

@@ -4,13 +4,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.utils.Shuffleboard;
+import frc.robot.utils.controllers.PIDController;
 
 /** Add your docs here. */
 public class SwerveModule {
@@ -24,19 +23,28 @@ public class SwerveModule {
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder turningEncoder;
 
-    private final ProfiledPIDController turningPID;
+    private final ProfiledPIDController turningPID; // in degrees
 
-    private final AnalogInput absoluteEncoder;
-    private final boolean isAbsoluteEncoderReversed;
-    private final double absoluteEncoderOffSet;
+    private final double offsetEncoder;
 
     private final PIDController drivePID;
 
     private final SimpleMotorFeedforward turningFeedforward;
 
-    public SwerveModule(int driveID, int turningID, int absoluteEncoderID, 
-        boolean isDriveMotorReversed, boolean isTurningMotorReversed, double absoluteEncoderOffSet,
-        boolean isAbsoluteEncoderReversed, SwerveConstants swerveConstants, ProfiledPIDController turningPID,
+    private final Shuffleboard board;
+    private final String driveKP = "driveKP";
+    private final String driveKI = "driveKI";
+    private final String driveKD = "driveKD";
+    private final String driveKF = "driveKF";
+
+    private final String turningKP = "turningKP";
+    private final String turningKI = "turningKI";
+    private final String turningKD = "turningKD";
+
+    public SwerveModule(String tabName,
+        int driveID, int turningID, boolean isDriveMotorReversed, 
+        boolean isTurningMotorReversed, double offsetEncoder,
+        SwerveConstants swerveConstants, ProfiledPIDController turningPID,
          SimpleMotorFeedforward turningFeedforward, PIDController drivePID) {
         // this.driveMotor = new TalonFX(driveID);
         // this.turningMotor = new TalonFX(turningID);
@@ -56,15 +64,24 @@ public class SwerveModule {
         turningEncoder.setVelocityConversionFactor(swerveConstants.getAnglePerPulse() 
         / swerveConstants.getVelocityTimeUnitInSeconds());
 
-        this.absoluteEncoderOffSet = absoluteEncoderOffSet;
-        this.isAbsoluteEncoderReversed = isAbsoluteEncoderReversed;
-        absoluteEncoder = new AnalogInput(absoluteEncoderID);
-
         this.drivePID = drivePID;
         this.turningPID = turningPID;
         this.turningFeedforward = turningFeedforward;
 
-        turningPID.enableContinuousInput(-Math.PI, Math.PI);
+        this.offsetEncoder = offsetEncoder;
+
+        this.board = new Shuffleboard(tabName);
+
+        board.addNum(driveKP, drivePID.getP());
+        board.addNum(driveKI, drivePID.getI());
+        board.addNum(driveKD, drivePID.getD());
+        board.addNum(driveKF, drivePID.getF());
+
+        board.addNum(turningKP, turningPID.getP());
+        board.addNum(turningKI, turningPID.getI());
+        board.addNum(turningKD, turningPID.getD());
+
+        turningPID.enableContinuousInput(-180, 180);
 
         resetEncoders();
     }
@@ -85,41 +102,50 @@ public class SwerveModule {
         return turningEncoder.getVelocity();
     }
 
-    public double getAbsoluteEncoder() {
-        return 
-            (((absoluteEncoder.getVoltage() / RobotController.getVoltage5V())* 2 * Math.PI) 
-            - absoluteEncoderOffSet) * (isAbsoluteEncoderReversed ? -1 : 1);
-    }
-
     public void resetEncoders() {
         driveEncoder.setPosition(0);
-        turningEncoder.setPosition(getAbsoluteEncoder());
+        turningEncoder.setPosition(0 + offsetEncoder);
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
+        return new SwerveModuleState(getDriveVelocity(),
+            new Rotation2d(Math.toRadians(getTurningPosition())));
     }
+
+    public void turningUsingPID(double setPoint) {
+        turningPID.setPID(board.getNum(turningKP), board.getNum(turningKP),
+            board.getNum(turningKP));
+        board.addNum("Turning Position", getTurningPosition());        
+        double turnOutput = turningPID.calculate(getTurningPosition(), setPoint);
+        double turnFeed = turningFeedforward.calculate(turningPID.getSetpoint().velocity);
+        turningMotor.set(turnOutput + turnFeed);
+    }
+
+    public void driveUsingPID(double setPoint) {
+        drivePID.setPID(board.getNum(driveKP), board.getNum(driveKP),
+            board.getNum(driveKP));
+        drivePID.setF(board.getNum(driveKF));
+        board.addNum("Drive Velocity", getDriveVelocity());
+        double driveOutput = 
+            drivePID.calculate(getDriveVelocity(), setPoint);
+        driveMotor.set(driveOutput);
+    }
+
 
     public void setDesiredState(SwerveModuleState desiredState, boolean inAutonomous) {
         SwerveModuleState optimizedState = SwerveModuleState.optimize(desiredState, 
-            new Rotation2d(getTurningPosition()));
-        double driveOutput;
-        if (inAutonomous) {
-            driveOutput = drivePID.calculate(getDriveVelocity(), optimizedState.speedMetersPerSecond);
+            new Rotation2d(Math.toRadians(getTurningPosition())));
+        if (Math.abs(optimizedState.speedMetersPerSecond) < 0.001) { 
+            stop();
         } else {
-            driveOutput = optimizedState.speedMetersPerSecond / swerveDrivetrainSubsystem.maxVelocity;
+            if (inAutonomous) {
+                driveUsingPID(optimizedState.speedMetersPerSecond);
+            } else {
+                driveMotor.set(optimizedState.speedMetersPerSecond / 
+                    swerveDrivetrainSubsystem.maxVelocity);
+            }
+            turningUsingPID(optimizedState.angle.getRadians());
         }
-        double turnOutput = turningPID.calculate(getTurningPosition(), optimizedState.angle.getRadians());
-        double turnFeed = turningFeedforward.calculate(turningPID.getSetpoint().velocity);
-
-        if (Math.abs(optimizedState.speedMetersPerSecond) < 0.001) {
-            driveOutput = 0;
-            turnOutput = 0;
-            turnFeed = 0;
-        }
-
-        driveMotor.set(driveOutput);
-        turningMotor.set(turnOutput + turnFeed);
     }
 
     public void stop() {

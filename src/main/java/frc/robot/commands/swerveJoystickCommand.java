@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.swerve.swerveDrivetrainSubsystem;
 import frc.robot.utils.JoystickContainer;
@@ -12,11 +11,11 @@ import frc.robot.utils.JoystickContainer;
 public class swerveJoystickCommand extends CommandBase {
   /** Creates a new swerveJoystickCommand. */
   private final swerveDrivetrainSubsystem swerve;
-  private final SlewRateLimiter xRateLimiter, yRateLimiter, turningRateLimiter;
+  //private final SlewRateLimiter xRateLimiter, yRateLimiter, turningRateLimiter;
   public swerveJoystickCommand() {
-    xRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAcceleration);
-    yRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAcceleration);
-    turningRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAngularAcceleration);
+    // xRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAcceleration);
+    // yRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAcceleration);
+    // turningRateLimiter = new SlewRateLimiter(swerveDrivetrainSubsystem.maxAngularAcceleration);
     swerve = swerveDrivetrainSubsystem.getInstance();
     addRequirements(swerve);
   }
@@ -38,14 +37,14 @@ public class swerveJoystickCommand extends CommandBase {
     ySpeed = Math.abs(xSpeed) < 0.01 ? 0 : ySpeed;
     turningSpeed = Math.abs(xSpeed) < 0.01 ? 0 : turningSpeed;
 
-    xSpeed = xRateLimiter.calculate(xSpeed * 
-    swerveDrivetrainSubsystem.maxVelocity);
-    ySpeed = yRateLimiter.calculate(ySpeed * 
-    swerveDrivetrainSubsystem.maxVelocity);
-    turningSpeed = turningRateLimiter.calculate(turningSpeed * 
-      swerveDrivetrainSubsystem.maxVelocity);
+    xSpeed = xSpeed * 
+    swerveDrivetrainSubsystem.maxVelocity / 4;
+    ySpeed = ySpeed * 
+    swerveDrivetrainSubsystem.maxVelocity / 4;
+    turningSpeed = turningSpeed * 
+      swerveDrivetrainSubsystem.maxVelocity / 4;
     
-      swerve.drive(xSpeed, ySpeed, turningSpeed, true, false);
+    swerve.drive(xSpeed, ySpeed, turningSpeed, true, false);
     
 
 
