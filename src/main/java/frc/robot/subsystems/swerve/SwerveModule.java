@@ -4,12 +4,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.utils.Shuffleboard;
-import frc.robot.utils.controllers.PIDController;
 
 /** Add your docs here. */
 public class SwerveModule {
@@ -35,7 +35,6 @@ public class SwerveModule {
     private final String driveKP = "driveKP";
     private final String driveKI = "driveKI";
     private final String driveKD = "driveKD";
-    private final String driveKF = "driveKF";
 
     private final String turningKP = "turningKP";
     private final String turningKI = "turningKI";
@@ -75,7 +74,6 @@ public class SwerveModule {
         board.addNum(driveKP, drivePID.getP());
         board.addNum(driveKI, drivePID.getI());
         board.addNum(driveKD, drivePID.getD());
-        board.addNum(driveKF, drivePID.getF());
 
         board.addNum(turningKP, turningPID.getP());
         board.addNum(turningKI, turningPID.getI());
@@ -124,10 +122,10 @@ public class SwerveModule {
     public void driveUsingPID(double setPoint) {
         drivePID.setPID(board.getNum(driveKP), board.getNum(driveKP),
             board.getNum(driveKP));
-        drivePID.setF(board.getNum(driveKF));
+        double F =  setPoint / swerveDrivetrainSubsystem.maxAcceleration;
         board.addNum("Drive Velocity", getDriveVelocity());
         double driveOutput = 
-            drivePID.calculate(getDriveVelocity(), setPoint);
+            drivePID.calculate(getDriveVelocity(), setPoint) + F;
         driveMotor.set(driveOutput);
     }
 

@@ -6,7 +6,7 @@ package frc.robot.subsystems.swerve;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import frc.robot.utils.controllers.PIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -75,7 +75,7 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
       swerveConstants, 
       new ProfiledPIDController(1, 1, 1, 
         new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0, 0, 0, -1, 1));
+      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
 
   private final SwerveModule frontRightModule = 
     new SwerveModule(
@@ -86,7 +86,7 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
       swerveConstants, 
       new ProfiledPIDController(1, 1, 1, 
         new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0, 0, 0, -1, 1));
+      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
 
   private final SwerveModule rearLeftModule = 
     new SwerveModule(
@@ -97,7 +97,7 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
         swerveConstants, 
         new ProfiledPIDController(1, 1, 1, 
           new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-        new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0, 0, 0, -1, 1));
+        new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
 
   private final SwerveModule rearRightModule = 
     new SwerveModule(
@@ -108,7 +108,7 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
       swerveConstants, 
       new ProfiledPIDController(1, 1, 1, 
         new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0, 0, 0, -1, 1));
+      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
   // TODO
 
   /** Creates a new DrivetrainSubsystem. */
