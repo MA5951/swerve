@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class JoystickContainer {
 
     public static XboxController operatingJoystick = new XboxController(RobotConstants.KOPERATING_JOYSTICK_PORT);
-    public static XboxController drivingJoystick = new XboxController(RobotConstants.KOPERATING_JOYSTICK_PORT);
+    public static XboxController drivingJoystick = new XboxController(RobotConstants.KDRIVING_JOYSTICK_PORT);
+    public static JoystickButton YButtonDrivingJoystick = new JoystickButton(drivingJoystick, RobotConstants.Y);
+
 
     public static JoystickButton AButton = new JoystickButton(operatingJoystick, RobotConstants.A);
     public static JoystickButton BButton = new JoystickButton(operatingJoystick, RobotConstants.B);

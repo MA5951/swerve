@@ -6,9 +6,7 @@ package frc.robot.subsystems.swerve;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,18 +20,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Shuffleboard;
 
 
-public class swerveDrivetrainSubsystem extends SubsystemBase {
-  private static swerveDrivetrainSubsystem swerve;
+public class SwerveDrivetrainSubsystem extends SubsystemBase {
+  private static SwerveDrivetrainSubsystem swerve;
   
-  // TODO
-  public final static double maxVelocity = 3;
-  public final static double maxAcceleration = 2;
-  public final static double maxAngularVelocity = Math.PI;
-  public final static double maxAngularAcceleration = 1;
-  public final static double maxAngularVelocityPerModule = Math.PI;
-  public final static double maxAngularAccelerationPerModule = 1;
-  // TODO
-
   public edu.wpi.first.math.controller.PIDController P_CONTROLLER_X;
   public edu.wpi.first.math.controller.PIDController P_CONTROLLER_Y;
   public ProfiledPIDController thetaProfiledPID; // degrees
@@ -46,12 +35,18 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
 
   private final Shuffleboard board;
 
-  // TODO
-  private final Translation2d frontLeftLocation = new Translation2d(0.35, 0.35);
-  private final Translation2d frontRightLocation = new Translation2d(0.35, -0.35);
-  private final Translation2d rearLeftLocation = new Translation2d(-0.35, 0.35);
-  private final Translation2d rearRightLocation = new Translation2d(-0.35, -0.35);
-  // TODO
+  private final Translation2d frontLeftLocation = new Translation2d(
+    -SwerveConstants.width / 2,
+    SwerveConstants.length / 2);
+  private final Translation2d frontRightLocation = new Translation2d(
+    SwerveConstants.width / 2,
+    SwerveConstants.length / 2);
+  private final Translation2d rearLeftLocation = new Translation2d(
+    -SwerveConstants.width / 2,
+    -SwerveConstants.length / 2);
+  private final Translation2d rearRightLocation = new Translation2d(
+    SwerveConstants.width / 2,
+    -SwerveConstants.length / 2);
 
   private final AHRS navx = new AHRS(Port.kOnboard);
 
@@ -59,60 +54,46 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-    new Rotation2d(Math.toRadians(navx.getAngle())));
+    new Rotation2d(Math.toRadians(navx.getFusedHeading())));
 
-  // TODO
-  private final SwerveConstants swerveConstants = new SwerveConstants(5, 1, 60);
-  // TODO
-
-  // TODO
   private final SwerveModule frontLeftModule = 
     new SwerveModule(
       "frontLeftModule",
       SwervePortMap.leftFrontDriveID, 
       SwervePortMap.leftFrontTurningID,
-      false, false, 0, 
-      swerveConstants, 
-      new ProfiledPIDController(1, 1, 1, 
-        new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
+      SwerveConstants.frontLeftModuleIsDriveMotorReversed,
+      SwerveConstants.frontLeftModuleIsTurningMotorReversed,
+      SwerveConstants.frontLeftModuleOffsetEncoder);
 
   private final SwerveModule frontRightModule = 
     new SwerveModule(
       "frontRightModule",
       SwervePortMap.rightFrontDriveID, 
       SwervePortMap.rightFrontTurningID, 
-      false, false, 0, 
-      swerveConstants, 
-      new ProfiledPIDController(1, 1, 1, 
-        new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
+      SwerveConstants.frontRightModuleIsDriveMotorReversed,
+      SwerveConstants.frontRightModuleIsTurningMotorReversed,
+      SwerveConstants.frontRightModuleOffsetEncoder);
 
   private final SwerveModule rearLeftModule = 
     new SwerveModule(
         "rearLeftModule",
         SwervePortMap.leftBackDriveID, 
         SwervePortMap.leftBackTurningID,
-        false, false, 0,
-        swerveConstants, 
-        new ProfiledPIDController(1, 1, 1, 
-          new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-        new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
+        SwerveConstants.rearLeftModuleIsDriveMotorReversed,
+        SwerveConstants.rearLeftModuleIsTurningMotorReversed,
+        SwerveConstants.rearLeftModuleOffsetEncoder);
 
   private final SwerveModule rearRightModule = 
     new SwerveModule(
       "rearRightModule",
       SwervePortMap.rightBackDriveID, 
       SwervePortMap.rightBackTurningID,
-      false, false, 0,
-      swerveConstants, 
-      new ProfiledPIDController(1, 1, 1, 
-        new TrapezoidProfile.Constraints(maxAngularVelocity, maxAngularAcceleration)),
-      new SimpleMotorFeedforward(0, 0, 0), new PIDController(0, 0, 0));
-  // TODO
+      SwerveConstants.rearRightModuleIsDriveMotorReversed,
+      SwerveConstants.rearRightModuleIsTurningMotorReversed,
+      SwerveConstants.rearRightModuleOffsetEncoder);
 
   /** Creates a new DrivetrainSubsystem. */
-  public swerveDrivetrainSubsystem() {
+  public SwerveDrivetrainSubsystem() {
     new Thread(() ->{
       try {
         Thread.sleep(1000);
@@ -122,37 +103,36 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
     }).start();
     this.board = new Shuffleboard("swerve");
 
-    // TODO
-    board.addNum(KP_X, 0);
-    // TODO
+    board.addNum(KP_X, SwerveConstants.KP_X);
 
     P_CONTROLLER_X = new edu.wpi.first.math.controller.
       PIDController(board.getNum(KP_X),0,0);
     
-    // TODO
-    board.addNum(KP_Y, 0);
-    // TODO
+    board.addNum(KP_Y, SwerveConstants.KP_Y);
 
     P_CONTROLLER_Y = new edu.wpi.first.math.controller.
       PIDController(board.getNum(KP_Y),0,0);
     
-    // TODO
-    board.addNum(theta_KP, 0);
-    board.addNum(theta_KI, 0);
-    board.addNum(theta_KD, 0);
-    // TODO
+    board.addNum(theta_KP, SwerveConstants.theta_KP);
+    board.addNum(theta_KI, SwerveConstants.theta_KI);
+    board.addNum(theta_KD, SwerveConstants.theta_KD);
+
     thetaProfiledPID = new ProfiledPIDController(
       board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD),
       new TrapezoidProfile.Constraints(
-        maxAngularVelocity, maxAngularAcceleration));  
+        SwerveConstants.maxAngularVelocity, SwerveConstants.maxAngularAcceleration));  
   }
 
   public double getYaw() {
-    return Math.IEEEremainder(navx.getAngle(), 360);
+    return Math.IEEEremainder(navx.getFusedHeading(), 360);
   }
 
   public Rotation2d getRotation2d() {
     return new Rotation2d(Math.toRadians(getYaw()));
+  }
+
+  public void resetNavx() {
+    navx.reset();
   }
 
   public Pose2d getPose() {
@@ -174,22 +154,27 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
     rearRightModule.stop();
   }
 
-  public void setModules(SwerveModuleState[] states, boolean inAutonomous) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, maxVelocity);
-    frontLeftModule.setDesiredState(states[0], inAutonomous);
-    frontRightModule.setDesiredState(states[1], inAutonomous);
-    rearLeftModule.setDesiredState(states[2], inAutonomous);
-    rearRightModule.setDesiredState(states[3], inAutonomous);
-
+  public void setModules(SwerveModuleState[] states) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.maxVelocity);
+    frontLeftModule.setDesiredState(states[0]);
+    frontRightModule.setDesiredState(states[1]);
+    rearLeftModule.setDesiredState(states[2]);
+    rearRightModule.setDesiredState(states[3]);
   }
 
-  public void drive(double x, double y, double rotation, boolean fieldRelative,
-   boolean inAutonomous) {
+  public void drive(double x, double y, double rotation, boolean fieldRelative) {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
             fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotation, getRotation2d())
                 : new ChassisSpeeds(x, y, rotation));
-    setModules(states, inAutonomous);
+    setModules(states);
+  }
+
+  public static SwerveDrivetrainSubsystem getInstance() {
+    if (swerve == null) {
+      swerve =  new SwerveDrivetrainSubsystem();
+    }
+    return swerve;
   }
 
   @Override
@@ -199,7 +184,7 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
     thetaProfiledPID.setPID(
       board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
-    odometry.update(new Rotation2d(navx.getAngle()), frontLeftModule.getState(),
+    odometry.update(new Rotation2d(Math.toRadians(navx.getFusedHeading())), frontLeftModule.getState(),
         frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
       
     board.addString("point", "(" + getPose().getX() + "," + getPose().getY() + ")");
@@ -231,12 +216,5 @@ public class swerveDrivetrainSubsystem extends SubsystemBase {
 
     // drive( P_CONTROLLER_X.calculate(getPose().getTranslation().getX(), 3), 
     //   0, 0, false, true);
-  }
-
-  public static swerveDrivetrainSubsystem getInstance() {
-    if (swerve == null) {
-      return new swerveDrivetrainSubsystem();
-    }
-    return swerve;
   }
 }

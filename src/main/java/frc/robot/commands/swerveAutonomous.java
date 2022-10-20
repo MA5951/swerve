@@ -15,28 +15,29 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.swerve.swerveDrivetrainSubsystem;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 
 public class swerveAutonomous extends CommandBase {
   /** Creates a new swerveAutonomous. */
-  private final swerveDrivetrainSubsystem swerve;
+  private final SwerveDrivetrainSubsystem swerve;
   private final Trajectory trajectory;
   private final HolonomicDriveController driveController;
   private final Timer timer = new Timer();
   public swerveAutonomous(Pose2d firstPose2d, List<Translation2d> list, Pose2d endPose2d) {
-    swerve = swerveDrivetrainSubsystem.getInstance();
+    swerve = SwerveDrivetrainSubsystem.getInstance();
     addRequirements(swerve);
     TrajectoryConfig trajectoryConfig = 
       new TrajectoryConfig(
-        swerveDrivetrainSubsystem.maxVelocity, 
-        swerveDrivetrainSubsystem.maxAcceleration).
+        SwerveConstants.maxVelocity, 
+        SwerveConstants.maxAcceleration).
         setKinematics(swerve.getKinematics());
     trajectory = TrajectoryGenerator.generateTrajectory(
       firstPose2d, list, endPose2d, trajectoryConfig);
     driveController = new HolonomicDriveController(
-      swerveDrivetrainSubsystem.getInstance().P_CONTROLLER_X,
-      swerveDrivetrainSubsystem.getInstance().P_CONTROLLER_Y,
-      swerveDrivetrainSubsystem.getInstance().thetaProfiledPID);
+        SwerveDrivetrainSubsystem.getInstance().P_CONTROLLER_X,
+        SwerveDrivetrainSubsystem.getInstance().P_CONTROLLER_Y,
+        SwerveDrivetrainSubsystem.getInstance().thetaProfiledPID);
   }
 
   // Called when the command is initially scheduled.
@@ -44,7 +45,7 @@ public class swerveAutonomous extends CommandBase {
   public void initialize() {
     timer.reset();
     timer.start();
-    swerve.resetOdometry(trajectory.getInitialPose());
+    //swerve.resetOdometry(trajectory.getInitialPose());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,8 +64,7 @@ public class swerveAutonomous extends CommandBase {
       desiredChassisSpeeds.vxMetersPerSecond,
       desiredChassisSpeeds.vyMetersPerSecond,
       desiredChassisSpeeds.omegaRadiansPerSecond,
-      false,
-      true);
+      false);
   }
 
   // Called once the command ends or is interrupted.
