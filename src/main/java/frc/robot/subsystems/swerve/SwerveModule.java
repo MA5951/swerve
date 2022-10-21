@@ -15,9 +15,6 @@ public class SwerveModule {
     private final TalonFX driveMotor;
     private final TalonFX turningMotor;
 
-    // private final RelativeEncoder driveEncoder;
-    // private final RelativeEncoder turningEncoder;
-
     private final PIDController turningPID; // in degrees
 
     private final double offsetEncoder;
@@ -67,8 +64,6 @@ public class SwerveModule {
         board.addNum(turningKP, turningPID.getP());
         board.addNum(turningKI, turningPID.getI());
         board.addNum(turningKD, turningPID.getD());
-
-        // turningPID.enableContinuousInput(-180, 180);
     }
 
     public double getDrivePosition() {
@@ -103,12 +98,20 @@ public class SwerveModule {
             new Rotation2d(Math.toRadians(getTurningPosition())));
     }
 
+    public void turningMotorSetPower(double power) {
+        turningMotor.set(ControlMode.PercentOutput, power);
+    }
+
+    public void driveMotorSetPower(double power) {
+        driveMotor.set(ControlMode.PercentOutput, power);
+    }
+
     public void turningUsingPID(double setPoint) {
         turningPID.setPID(board.getNum(turningKP), board.getNum(turningKI),
             board.getNum(turningKD));
         board.addNum("Turning Position", getTurningPosition());        
         double turnOutput = turningPID.calculate(getTurningPosition(), setPoint);
-        turningMotor.set(ControlMode.PercentOutput, turnOutput);
+        turningMotorSetPower(turnOutput);
     }
 
     public void driveUsingPID(double setPoint) {
@@ -118,7 +121,7 @@ public class SwerveModule {
         board.addNum("Drive Velocity", getDriveVelocity());
         double driveOutput =
             drivePID.calculate(getDriveVelocity(), setPoint) + F;
-        driveMotor.set(ControlMode.PercentOutput, driveOutput);
+        driveMotorSetPower(driveOutput);
     }
 
 

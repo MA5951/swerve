@@ -193,28 +193,35 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     /**
      * for calibration
      */
+    // frontLeftModule.turningMotorSetPower(0.3);
+    // frontLeftModule.driveMotorSetPower(0.3);
     // frontLeftModule.turningUsingPID(100);
     // frontLeftModule.driveUsingPID(3);
 
+    // frontRightModule.turningMotorSetPower(0.3);
+    // frontRightModule.driveMotorSetPower(0.3);
     // frontRightModule.turningUsingPID(100);
     // frontRightModule.driveUsingPID(3);
 
+    // rearLeftModule.turningMotorSetPower(0.3);
+    // rearLeftModule.driveMotorSetPower(0.3);
     // rearLeftModule.turningUsingPID(100);
     // rearLeftModule.driveUsingPID(3);
 
+    // rearRightModule.turningMotorSetPower(0.3);
+    // rearRightModule.driveMotorSetPower(0.3);
     // rearRightModule.turningUsingPID(100);
     // rearRightModule.driveUsingPID(3);
 
     // drive(0, 0, 
     //   thetaProfiledPID.calculate(getPose().getRotation().getDegrees(),
-    //    Math.toRadians(30)),
-    //   false, true);
+    //   30), false);
 
     // drive(0, 
     //   P_CONTROLLER_Y.calculate(getPose().getTranslation().getY(), 3),
-    //   0, false, true);
+    //   0, false);
 
     // drive( P_CONTROLLER_X.calculate(getPose().getTranslation().getX(), 3), 
-    //   0, 0, false, true);
+    //   0, 0, false);
   }
 }
