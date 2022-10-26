@@ -61,6 +61,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       "frontLeftModule",
       SwervePortMap.leftFrontDriveID, 
       SwervePortMap.leftFrontTurningID,
+      SwervePortMap.leftFrontAbsoluteEcoder,
       SwerveConstants.frontLeftModuleIsDriveMotorReversed,
       SwerveConstants.frontLeftModuleIsTurningMotorReversed,
       SwerveConstants.frontLeftModuleOffsetEncoder);
@@ -70,6 +71,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       "frontRightModule",
       SwervePortMap.rightFrontDriveID, 
       SwervePortMap.rightFrontTurningID, 
+      SwervePortMap.rightFrontAbsoluteEcoder,
       SwerveConstants.frontRightModuleIsDriveMotorReversed,
       SwerveConstants.frontRightModuleIsTurningMotorReversed,
       SwerveConstants.frontRightModuleOffsetEncoder);
@@ -79,6 +81,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         "rearLeftModule",
         SwervePortMap.leftBackDriveID, 
         SwervePortMap.leftBackTurningID,
+        SwervePortMap.leftBackAbsoluteEcoder,
         SwerveConstants.rearLeftModuleIsDriveMotorReversed,
         SwerveConstants.rearLeftModuleIsTurningMotorReversed,
         SwerveConstants.rearLeftModuleOffsetEncoder);
@@ -88,6 +91,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       "rearRightModule",
       SwervePortMap.rightBackDriveID, 
       SwervePortMap.rightBackTurningID,
+      SwervePortMap.rightBackAbsoluteEcoder,
       SwerveConstants.rearRightModuleIsDriveMotorReversed,
       SwerveConstants.rearRightModuleIsTurningMotorReversed,
       SwerveConstants.rearRightModuleOffsetEncoder);

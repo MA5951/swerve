@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +22,8 @@ public class SwerveModule {
 
     private final PIDController drivePID;
 
+    private final CANCoder absoluteEcoder;
+
     private final Shuffleboard board;
     private final String driveKP = "driveKP";
     private final String driveKI = "driveKI";
@@ -31,7 +34,7 @@ public class SwerveModule {
     private final String turningKD = "turningKD";
 
     public SwerveModule(String tabName, int driveID, 
-        int turningID, boolean isDriveMotorReversed,
+        int turningID, int absoluteEcoderID, boolean isDriveMotorReversed,
         boolean isTurningMotorReversed, double offsetEncoder) {
         this.driveMotor = new TalonFX(driveID);
         this.turningMotor = new TalonFX(turningID);
@@ -39,9 +42,10 @@ public class SwerveModule {
         driveMotor.setNeutralMode(NeutralMode.Brake);
         turningMotor.setNeutralMode(NeutralMode.Brake);
 
-
         driveMotor.setInverted(isDriveMotorReversed);
         turningMotor.setInverted(isTurningMotorReversed);
+
+        this.absoluteEcoder = new CANCoder(absoluteEcoderID);
 
         this.drivePID = new PIDController(
             SwerveConstants.drivePIDKP, 
@@ -64,6 +68,11 @@ public class SwerveModule {
         board.addNum(turningKP, turningPID.getP());
         board.addNum(turningKI, turningPID.getI());
         board.addNum(turningKD, turningPID.getD());
+    }
+
+    public double getabsoluteEcoderPosition() {
+        return ((absoluteEcoder.getPosition() / 
+            SwerveConstants.CANcoderResolution) * 360) % 360; 
     }
 
     public double getDrivePosition() {
@@ -90,7 +99,9 @@ public class SwerveModule {
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
-        turningMotor.setSelectedSensorPosition(0 + offsetEncoder);
+        turningMotor.setSelectedSensorPosition(
+            (getabsoluteEcoderPosition() + offsetEncoder) / 
+            SwerveConstants.anglePerPulse);
     }
 
     public SwerveModuleState getState() {

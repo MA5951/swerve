@@ -8,8 +8,10 @@ public class SwerveConstants {
     // Modules constants
     private final static double turningGearRatio = 1;
     private final static double driveGearRatio = 1;
-    private final static int encoderResolution = 1;
+    private final static int encoderResolution = 2048;
     private final static double wheelRadius = 0;
+
+    public final static int CANcoderResolution = 4096;
 
     public final static double velocityTimeUnitInSeconds = 0.1;
 
