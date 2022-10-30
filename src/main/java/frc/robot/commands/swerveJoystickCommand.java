@@ -44,9 +44,6 @@ public class swerveJoystickCommand extends CommandBase {
     
     
     swerve.drive(xSpeed, ySpeed, turningSpeed, true);
-    
-
-
   }
 
   // Called once the command ends or is interrupted.
