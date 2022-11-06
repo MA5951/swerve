@@ -10,9 +10,7 @@ public class SwerveConstants {
     private final static double driveGearRatio = 1;
     private final static int encoderResolution = 2048;
     private final static double wheelRadius = 0;
-
-    public final static int CANcoderResolution = 4096;
-
+    
     public final static double velocityTimeUnitInSeconds = 0.1;
 
     public final static double distancePerPulse = (2 * wheelRadius * Math.PI)
@@ -40,15 +38,31 @@ public class SwerveConstants {
     public final static boolean rearRightModuleIsDriveMotorReversed = false;
     public final static boolean rearRightModuleIsTurningMotorReversed = false;
 
-    // Modules turning PID
+    // Modules turning config
+    //PID
     public final static double turningPIDKP = 0;
     public final static double turningPIDKI = 0;
     public final static double turningPIDKD = 0;
+    // Ramp
+    public final static double openloopRamp = 0.25;
+    public final static double closedloopRamp = 0;
+    // Current Limit
+    public static final int turningContinuousCurrentLimit = 25;
+    public static final int turningPeakCurrentLimit = 40;
+    public static final double turningPeakCurrentDuration = 0.1;
+    public static final boolean turningEnableCurrentLimit = true;
 
-    // Modules drive PID
+    // Modules drive config
+    //PID
     public final static double drivePIDKP = 0;
     public final static double drivePIDKI = 0;
     public final static double drivePIDKD = 0;
+    public final static double drivePIDKF = 0;
+    // Current Limit
+    public static final int driveContinuousCurrentLimit = 35;
+    public static final int drivePeakCurrentLimit = 60;
+    public static final double drivePeakCurrentDuration = 0.1;
+    public static final boolean driveEnableCurrentLimit = true;
 
     // swerve controllers
 
@@ -66,6 +80,6 @@ public class SwerveConstants {
     // swerve physics
     public final static double maxVelocity = 0;
     public final static double maxAcceleration = 0;
-    public final static double maxAngularVelocity = 0;
-    public final static double maxAngularAcceleration = 0;
+    public final static double maxAngularVelocity = 0; // radians
+    public final static double maxAngularAcceleration = 0; // radians
 }
