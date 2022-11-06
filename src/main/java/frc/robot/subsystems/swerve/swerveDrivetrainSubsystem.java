@@ -55,7 +55,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
       new Rotation2d(Math.toRadians(navx.getFusedHeading())));
 
-  private final SwerveModule frontLeftModule = new SwerveModule(
+  private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
       SwervePortMap.leftFrontDriveID,
       SwervePortMap.leftFrontTurningID,
@@ -64,7 +64,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.frontLeftModuleIsTurningMotorReversed,
       SwerveConstants.frontLeftModuleOffsetEncoder);
 
-  private final SwerveModule frontRightModule = new SwerveModule(
+  private final SwerveModule frontRightModule = new SwerveModuleTalonFX(
       "frontRightModule",
       SwervePortMap.rightFrontDriveID,
       SwervePortMap.rightFrontTurningID,
@@ -73,7 +73,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.frontRightModuleIsTurningMotorReversed,
       SwerveConstants.frontRightModuleOffsetEncoder);
 
-  private final SwerveModule rearLeftModule = new SwerveModule(
+  private final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
       "rearLeftModule",
       SwervePortMap.leftBackDriveID,
       SwervePortMap.leftBackTurningID,
@@ -82,7 +82,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.rearLeftModuleIsTurningMotorReversed,
       SwerveConstants.rearLeftModuleOffsetEncoder);
 
-  private final SwerveModule rearRightModule = new SwerveModule(
+  private final SwerveModule rearRightModule = new SwerveModuleTalonFX(
       "rearRightModule",
       SwervePortMap.rightBackDriveID,
       SwervePortMap.rightBackTurningID,
@@ -159,11 +159,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     rearRightModule.setDesiredState(states[3]);
   }
 
-  public void drive(double x, double y, double rotation, boolean fieldRelative) {
+  public void drive(double x, double y, double omega, boolean fieldRelative) {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
-            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotation, getRotation2d())
-                : new ChassisSpeeds(x, y, rotation));
+            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, getRotation2d())
+                : new ChassisSpeeds(x, y, omega));
     setModules(states);
   }
 
