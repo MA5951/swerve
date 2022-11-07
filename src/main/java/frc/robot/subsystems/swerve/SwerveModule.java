@@ -2,30 +2,30 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public interface SwerveModule {
-    public double getAbsoluteEncoderPosition();
+public abstract class SwerveModule {
+    public abstract double getAbsoluteEncoderPosition();
 
-    public double getDrivePosition();
+    public abstract double getDrivePosition();
 
-    public double getTurningPosition();
+    public abstract double getTurningPosition();
 
-    public double getDriveVelocity();
+    public abstract double getDriveVelocity();
 
-    public double getTurningVelocity();
+    public abstract double getTurningVelocity();
 
-    public void resetEncoders();
+    public abstract void resetEncoders();
 
-    public SwerveModuleState getState();
+    public abstract SwerveModuleState getState();
     
-    public void turningMotorSetPower(double power);
+    public abstract void turningMotorSetPower(double power);
 
-    public void driveMotorSetPower(double power);
+    public abstract void driveMotorSetPower(double power);
 
-    public void turningUsingPID(double setPoint);
+    public abstract void turningUsingPID(double setPoint);
 
-    public void driveUsingPID(double setPoint);
+    public abstract void driveUsingPID(double setPoint);
 
-    public void setDesiredState(SwerveModuleState desiredState);
+    public abstract void setDesiredState(SwerveModuleState desiredState);
 
-    public void stop();
+    public abstract void stop();
 }

@@ -12,7 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.utils.Shuffleboard;
 
 /** Add your docs here. */
-public class SwerveModuleTalonFX implements SwerveModule{
+public class SwerveModuleTalonFX extends SwerveModule{
 
     private final TalonFX driveMotor;
     private final TalonFX turningMotor;
