@@ -4,9 +4,15 @@
 
 package frc.robot.subsystems.swerve;
 
-import com.kauailabs.navx.frc.AHRS;
+import java.util.HashMap;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,17 +20,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Shuffleboard;
 
 public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private static SwerveDrivetrainSubsystem swerve;
 
-  public edu.wpi.first.math.controller.PIDController P_CONTROLLER_X; // radians
-  public edu.wpi.first.math.controller.PIDController P_CONTROLLER_Y; // radians
-  public ProfiledPIDController thetaProfiledPID; // degrees
+  public PIDController P_CONTROLLER_X;
+  public PIDController P_CONTROLLER_Y;
+  public PIDController thetaPID;
 
   private final String KP_X = "kp_x";
   private final String KP_Y = "kp_y";
@@ -104,20 +112,18 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     board.addNum(KP_X, SwerveConstants.KP_X);
 
-    P_CONTROLLER_X = new edu.wpi.first.math.controller.PIDController(board.getNum(KP_X), 0, 0);
+    P_CONTROLLER_X = new PIDController(board.getNum(KP_X), 0, 0);
 
     board.addNum(KP_Y, SwerveConstants.KP_Y);
 
-    P_CONTROLLER_Y = new edu.wpi.first.math.controller.PIDController(board.getNum(KP_Y), 0, 0);
+    P_CONTROLLER_Y = new PIDController(board.getNum(KP_Y), 0, 0);
 
     board.addNum(theta_KP, SwerveConstants.theta_KP);
     board.addNum(theta_KI, SwerveConstants.theta_KI);
     board.addNum(theta_KD, SwerveConstants.theta_KD);
 
-    thetaProfiledPID = new ProfiledPIDController(
-        board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD),
-        new TrapezoidProfile.Constraints(
-            SwerveConstants.maxAngularVelocity, SwerveConstants.maxAngularAcceleration));
+    thetaPID = new PIDController(board.getNum(theta_KP),
+     board.getNum(theta_KI), board.getNum(theta_KD));
   }
 
   public double getYaw() {
@@ -174,13 +180,47 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     return swerve;
   }
 
+  public Command getAutonomousPathCommand(
+    String pathName, boolean isFirst, Command[] events) {
+    PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName,
+     new PathConstraints(
+      SwerveConstants.maxVelocity, SwerveConstants.maxAcceleration));
+    HashMap<String, Command> eventsMap = new HashMap<String, Command>();
+    for (int i = 0; i < events.length; i++) {
+      eventsMap.put("marker" + (i + 1), events[i]);
+    }
+
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> {
+        if (isFirst) {
+          resetOdometry(trajectory.getInitialPose());
+        }
+      }),
+      new PPSwerveControllerCommand(
+        trajectory,
+        this::getPose,
+        getKinematics(),
+        P_CONTROLLER_X,
+        P_CONTROLLER_Y,
+        thetaPID,
+        this::setModules,
+        eventsMap,
+        this)
+    );
+  }
+
+  public Command getAutonomousPathCommand(
+    String pathName, boolean isFirst) {
+    return getAutonomousPathCommand(pathName, isFirst, new Command[0]);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     P_CONTROLLER_X.setP(board.getNum(KP_X));
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
-    thetaProfiledPID.setPID(
-        board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
+    thetaPID.setPID(board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
     odometry.update(new Rotation2d(Math.toRadians(navx.getFusedHeading())), frontLeftModule.getState(),
         frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
 
