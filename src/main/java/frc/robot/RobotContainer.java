@@ -4,16 +4,10 @@
 
 package frc.robot;
 
-import java.util.List;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.swerveAutonomous;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 import frc.robot.utils.JoystickContainer;
 
@@ -51,17 +45,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new swerveAutonomous(
-      new Pose2d(
-        new Translation2d(0,0),
-        new Rotation2d(Math.toRadians(0))
-      ), 
-      List.of(
-        new Translation2d(0,2)
-      ),
-      new Pose2d(
-        new Translation2d(0,5),
-        new Rotation2d(Math.toRadians(0))
-      ));
+    return SwerveDrivetrainSubsystem.getInstance().getAutonomousPathCommand(
+      "try", true);
   }
 }

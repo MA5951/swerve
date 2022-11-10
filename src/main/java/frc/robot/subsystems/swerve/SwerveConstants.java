@@ -57,7 +57,8 @@ public class SwerveConstants {
     public final static double drivePIDKP = 0;
     public final static double drivePIDKI = 0;
     public final static double drivePIDKD = 0;
-    public final static double drivePIDKF = 0;
+    public final static double driveKS = 0;
+    public final static double driveKV = 0;
     // Current Limit
     public static final int driveContinuousCurrentLimit = 35;
     public static final int drivePeakCurrentLimit = 60;

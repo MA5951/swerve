@@ -1,12 +1,15 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.utils.Shuffleboard;
@@ -17,6 +20,8 @@ public class SwerveModuleTalonFX extends SwerveModule{
     private final TalonFX driveMotor;
     private final TalonFX turningMotor;
 
+    private SimpleMotorFeedforward feedforward;
+
     private final CANCoder absoluteEcoder;
 
     private final double offsetEncoder;
@@ -25,7 +30,6 @@ public class SwerveModuleTalonFX extends SwerveModule{
     private final String driveKP = "driveKP";
     private final String driveKI = "driveKI";
     private final String driveKD = "driveKD";
-    private final String driveKF = "driveKF";
 
     private final String turningKP = "turningKP";
     private final String turningKI = "turningKI";
@@ -53,10 +57,12 @@ public class SwerveModuleTalonFX extends SwerveModule{
         configDriveMotor();
         resetEncoders();
 
+        feedforward = 
+        new SimpleMotorFeedforward(SwerveConstants.driveKS, SwerveConstants.driveKV);
+
         board.addNum(driveKP, SwerveConstants.drivePIDKP);
         board.addNum(driveKI, SwerveConstants.drivePIDKI);
         board.addNum(driveKD, SwerveConstants.drivePIDKD);
-        board.addNum(driveKF, SwerveConstants.drivePIDKF);
 
         board.addNum(turningKP, SwerveConstants.turningPIDKP);
         board.addNum(turningKI, SwerveConstants.turningPIDKI);
@@ -85,7 +91,6 @@ public class SwerveModuleTalonFX extends SwerveModule{
         driveConfiguration.slot0.kP = SwerveConstants.drivePIDKP;
         driveConfiguration.slot0.kI = SwerveConstants.drivePIDKI;
         driveConfiguration.slot0.kD = SwerveConstants.drivePIDKD;
-        driveConfiguration.slot0.kF = SwerveConstants.drivePIDKF;
         driveConfiguration.supplyCurrLimit = new SupplyCurrentLimitConfiguration(
                 SwerveConstants.driveEnableCurrentLimit,
                 SwerveConstants.driveContinuousCurrentLimit,
@@ -157,11 +162,12 @@ public class SwerveModuleTalonFX extends SwerveModule{
         driveMotor.config_kP(0, board.getNum(driveKP));
         driveMotor.config_kI(0, board.getNum(driveKI));
         driveMotor.config_kD(0, board.getNum(driveKD));
-        driveMotor.config_kF(0, board.getNum(driveKF));
         board.addNum("Drive Velocity", getDriveVelocity());
         driveMotor.set(ControlMode.Velocity,
                 setPoint / SwerveConstants.distancePerPulse *
-                        SwerveConstants.velocityTimeUnitInSeconds);
+                        SwerveConstants.velocityTimeUnitInSeconds, 
+                        DemandType.ArbitraryFeedForward, 
+                        feedforward.calculate(setPoint));
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
