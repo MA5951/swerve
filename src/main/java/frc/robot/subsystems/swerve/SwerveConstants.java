@@ -2,21 +2,21 @@ package frc.robot.subsystems.swerve;
 
 public class SwerveConstants {
     // swerve constants
-    public final static double width = 0;
-    public final static double length = 0;
+    public final static double width = 0.61665;
+    public final static double length = 0.61665;
 
     // Modules constants
-    private final static double turningGearRatio = 1;
-    private final static double driveGearRatio = 1;
+    private final static double turningGearRatio = 150d / 7;
+    private final static double driveGearRatio = 6.75;
     private final static int encoderResolution = 2048;
-    private final static double wheelRadius = 0;
+    private final static double wheelRadius = 0.05;
     
     public final static double velocityTimeUnitInSeconds = 0.1;
 
     public final static double distancePerPulse = (2 * wheelRadius * Math.PI)
         / (encoderResolution * driveGearRatio);
-    public final static double anglePerPulse = 360 / 
-        encoderResolution * turningGearRatio;
+    public final static double anglePerPulse = 360d / 
+        (encoderResolution * turningGearRatio);
      
     // front left module
     public final static double frontLeftModuleOffsetEncoder = 0;
@@ -47,10 +47,10 @@ public class SwerveConstants {
     public final static double openloopRamp = 0.25;
     public final static double closedloopRamp = 0;
     // Current Limit
-    public static final int turningContinuousCurrentLimit = 25;
-    public static final int turningPeakCurrentLimit = 40;
-    public static final double turningPeakCurrentDuration = 0.1;
-    public static final boolean turningEnableCurrentLimit = true;
+    public final static int turningContinuousCurrentLimit = 25;
+    public final static int turningPeakCurrentLimit = 40;
+    public final static double turningPeakCurrentDuration = 0.1;
+    public final static boolean turningEnableCurrentLimit = true;
 
     // Modules drive config
     //PID
@@ -60,10 +60,10 @@ public class SwerveConstants {
     public final static double driveKS = 0;
     public final static double driveKV = 0;
     // Current Limit
-    public static final int driveContinuousCurrentLimit = 35;
-    public static final int drivePeakCurrentLimit = 60;
-    public static final double drivePeakCurrentDuration = 0.1;
-    public static final boolean driveEnableCurrentLimit = true;
+    public final static int driveContinuousCurrentLimit = 35;
+    public final static int drivePeakCurrentLimit = 60;
+    public final static double drivePeakCurrentDuration = 0.1;
+    public final static boolean driveEnableCurrentLimit = true;
 
     // swerve controllers
 
@@ -73,7 +73,7 @@ public class SwerveConstants {
     // swerve y P_CONTROLLER
     public final static double KP_Y = 0;
 
-    // swerve theta PID_CONTROLLER
+    // swerve theta PID_CONTROLLER radians
     public final static double theta_KP = 0;
     public final static double theta_KI = 0;
     public final static double theta_KD = 0;
@@ -82,5 +82,4 @@ public class SwerveConstants {
     public final static double maxVelocity = 0;
     public final static double maxAcceleration = 0;
     public final static double maxAngularVelocity = 0; // radians
-    public final static double maxAngularAcceleration = 0; // radians
 }

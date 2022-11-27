@@ -81,9 +81,9 @@ public class Robot extends TimedRobot {
     }
     SwerveDrivetrainSubsystem.getInstance();
 
-    CommandScheduler.getInstance().setDefaultCommand(
-      SwerveDrivetrainSubsystem.getInstance(), 
-      new swerveJoystickCommand());
+    // CommandScheduler.getInstance().setDefaultCommand(
+    //   SwerveDrivetrainSubsystem.getInstance(), 
+    //   new swerveJoystickCommand());
   }
 
   /** This function is called periodically during operator control. */

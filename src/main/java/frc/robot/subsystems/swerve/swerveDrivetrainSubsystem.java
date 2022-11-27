@@ -55,13 +55,13 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.width / 2,
       -SwerveConstants.length / 2);
 
-  private final AHRS navx = new AHRS(Port.kOnboard);
+  private final AHRS navx = new AHRS(Port.kMXP);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-      new Rotation2d(Math.toRadians(navx.getFusedHeading())));
+      new Rotation2d(Math.toRadians(navx.getYaw())));
 
   private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -127,7 +127,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getYaw() {
-    return Math.IEEEremainder(navx.getFusedHeading(), 360);
+    return navx.getYaw();
   }
 
   public Rotation2d getRotation2d() {
@@ -221,10 +221,21 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     P_CONTROLLER_X.setP(board.getNum(KP_X));
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
     thetaPID.setPID(board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
-    odometry.update(new Rotation2d(Math.toRadians(navx.getFusedHeading())), frontLeftModule.getState(),
+    odometry.update(new Rotation2d(Math.toRadians(navx.getYaw())), frontLeftModule.getState(),
         frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
 
     board.addString("point", "(" + getPose().getX() + "," + getPose().getY() + ")");
     board.addNum("angle in degrees", getPose().getRotation().getDegrees());
+    board.addNum("angle in radians", getPose().getRotation().getRadians());
+
+    board.addNum("cancoder frontLeft", frontLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder frontRight", frontRightModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder rearLeft", rearLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder rearRight", rearRightModule.getAbsoluteEncoderPosition());
+
+    board.addNum("frontLeft angle", frontLeftModule.getTurningPosition());
+    board.addNum("frontRight angle", frontRightModule.getTurningPosition());
+    board.addNum("rearLeft angle", rearLeftModule.getTurningPosition());
+    board.addNum("rearRight angle", rearRightModule.getTurningPosition());
   }
 }
