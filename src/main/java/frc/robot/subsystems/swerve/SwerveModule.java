@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
@@ -29,15 +31,17 @@ public abstract class SwerveModule {
 
     public abstract void driveUsingPID(double setPoint);
 
+    public abstract void setNeutralMode(NeutralMode mode);
+
     public void setDesiredState(SwerveModuleState desiredState) {
         SwerveModuleState optimizedState = SwerveModule.optimize(desiredState,
-                getTurningPosition());
-        driveUsingPID(optimizedState.speedMetersPerSecond);
+                getTurningPosition(), getDriveVelocity());
         if (optimizedState.speedMetersPerSecond != 0) {
             turningUsingPID(optimizedState.angle.getDegrees());
         } else {
             turningMotorSetPower(0);
         }
+        driveUsingPID(optimizedState.speedMetersPerSecond);
     }
 
     public void stop() {
@@ -45,7 +49,8 @@ public abstract class SwerveModule {
         turningMotorSetPower(0);
     }
 
-    public static SwerveModuleState optimize(SwerveModuleState desiredState, double currentAngle) {
+    public static SwerveModuleState optimize(SwerveModuleState desiredState, 
+    double currentAngle, double currV) {
         // desired angle diff in [-360, +360]
         double _angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
 

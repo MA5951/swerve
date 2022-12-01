@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -50,7 +53,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    SwerveDrivetrainSubsystem.getInstance().setNeutralMode(NeutralMode.Coast);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -79,7 +84,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    SwerveDrivetrainSubsystem.getInstance();
+    SwerveDrivetrainSubsystem.getInstance().setNeutralMode(NeutralMode.Brake);
 
     // CommandScheduler.getInstance().setDefaultCommand(
     //   SwerveDrivetrainSubsystem.getInstance(), 

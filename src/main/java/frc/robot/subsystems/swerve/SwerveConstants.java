@@ -19,28 +19,28 @@ public class SwerveConstants {
         (encoderResolution * turningGearRatio);
      
     // front left module
-    public final static double frontLeftModuleOffsetEncoder = 0;
-    public final static boolean frontLeftModuleIsDriveMotorReversed = false;
+    public final static double frontLeftModuleOffsetEncoder = 348;
+    public final static boolean frontLeftModuleIsDriveMotorReversed = true;
     public final static boolean frontLeftModuleIsTurningMotorReversed = false;
  
     // front right module
-    public final static double frontRightModuleOffsetEncoder = 0;
+    public final static double frontRightModuleOffsetEncoder = 214;
     public final static boolean frontRightModuleIsDriveMotorReversed = false;
     public final static boolean frontRightModuleIsTurningMotorReversed = false;
  
     // rear left module
-    public final static double rearLeftModuleOffsetEncoder = 0;
-    public final static boolean rearLeftModuleIsDriveMotorReversed = false;
+    public final static double rearLeftModuleOffsetEncoder = 147;
+    public final static boolean rearLeftModuleIsDriveMotorReversed = true;
     public final static boolean rearLeftModuleIsTurningMotorReversed = false;
  
     // rear right module
-    public final static double rearRightModuleOffsetEncoder = 0;
+    public final static double rearRightModuleOffsetEncoder = 269;
     public final static boolean rearRightModuleIsDriveMotorReversed = false;
     public final static boolean rearRightModuleIsTurningMotorReversed = false;
 
     // Modules turning config
     //PID
-    public final static double turningPIDKP = 0;
+    public final static double turningPIDKP = 0.25;
     public final static double turningPIDKI = 0;
     public final static double turningPIDKD = 0;
     // Ramp
@@ -54,11 +54,11 @@ public class SwerveConstants {
 
     // Modules drive config
     //PID
-    public final static double drivePIDKP = 0;
+    public final static double drivePIDKP = 0.06;
     public final static double drivePIDKI = 0;
     public final static double drivePIDKD = 0;
     public final static double driveKS = 0;
-    public final static double driveKV = 0;
+    public final static double driveKV = 0.206;
     // Current Limit
     public final static int driveContinuousCurrentLimit = 35;
     public final static int drivePeakCurrentLimit = 60;
@@ -68,18 +68,18 @@ public class SwerveConstants {
     // swerve controllers
 
     // swerve x P_CONTROLLER
-    public final static double KP_X = 0;
+    public final static double KP_X = 1.7;
 
     // swerve y P_CONTROLLER
-    public final static double KP_Y = 0;
+    public final static double KP_Y = 1.7;
 
     // swerve theta PID_CONTROLLER radians
-    public final static double theta_KP = 0;
+    public final static double theta_KP = 3.5;
     public final static double theta_KI = 0;
     public final static double theta_KD = 0;
 
     // swerve physics
-    public final static double maxVelocity = 0;
+    public final static double maxVelocity = 4.96824;
     public final static double maxAcceleration = 0;
-    public final static double maxAngularVelocity = 0; // radians
+    public final static double maxAngularVelocity = maxVelocity / (0.61665 / 2); // radians
 }

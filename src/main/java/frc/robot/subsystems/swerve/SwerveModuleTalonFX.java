@@ -100,6 +100,10 @@ public class SwerveModuleTalonFX extends SwerveModule{
         driveMotor.configAllSettings(driveConfiguration);
     }
 
+    public void setNeutralMode(NeutralMode mode) {
+        turningMotor.setNeutralMode(mode);
+    }
+
     public double getAbsoluteEncoderPosition() {
         return absoluteEcoder.getAbsolutePosition();
     }
@@ -128,9 +132,9 @@ public class SwerveModuleTalonFX extends SwerveModule{
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
-        turningMotor.setSelectedSensorPosition(
-                (getAbsoluteEncoderPosition() - offsetEncoder) /
-                        SwerveConstants.anglePerPulse);
+        turningMotor.setSelectedSensorPosition(0);
+            // (getAbsoluteEncoderPosition() - offsetEncoder) /
+            //             SwerveConstants.anglePerPulse);
     }
 
     public void turningMotorSetPower(double power) {
@@ -158,7 +162,7 @@ public class SwerveModuleTalonFX extends SwerveModule{
         driveMotor.set(ControlMode.Velocity,
                 setPoint / SwerveConstants.distancePerPulse *
                         SwerveConstants.velocityTimeUnitInSeconds, 
-                        DemandType.ArbitraryFeedForward, // TODO make sure the feedforword work
+                        DemandType.ArbitraryFeedForward,
                         feedforward.calculate(setPoint));
     }
 }

@@ -45,7 +45,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null; //SwerveDrivetrainSubsystem.getInstance().getAutonomousPathCommand(
-      //"try", true);
+    return SwerveDrivetrainSubsystem.getInstance().getAutonomousPathCommand(
+      "try", true);
   }
 }
