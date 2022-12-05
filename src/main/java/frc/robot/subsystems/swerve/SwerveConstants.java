@@ -19,24 +19,30 @@ public class SwerveConstants {
         (encoderResolution * turningGearRatio);
      
     // front left module
-    public final static double frontLeftModuleOffsetEncoder = 348;
+    public final static double frontLeftModuleOffsetEncoder = 10;
     public final static boolean frontLeftModuleIsDriveMotorReversed = true;
     public final static boolean frontLeftModuleIsTurningMotorReversed = false;
+    public final static boolean frontLeftModuleIsAbsoluteEcoderReversed = true;
  
     // front right module
-    public final static double frontRightModuleOffsetEncoder = 214;
+    public final static double frontRightModuleOffsetEncoder = 145;
     public final static boolean frontRightModuleIsDriveMotorReversed = false;
     public final static boolean frontRightModuleIsTurningMotorReversed = false;
+    public final static boolean frontRightModuleIsAbsoluteEcoderReversed = true;
  
     // rear left module
-    public final static double rearLeftModuleOffsetEncoder = 147;
+    public final static double rearLeftModuleOffsetEncoder = 211;
     public final static boolean rearLeftModuleIsDriveMotorReversed = true;
     public final static boolean rearLeftModuleIsTurningMotorReversed = false;
+    public final static boolean rearLeftModuleIsAbsoluteEcoderReversed = true;
+
  
     // rear right module
-    public final static double rearRightModuleOffsetEncoder = 269;
+    public final static double rearRightModuleOffsetEncoder = 90;
     public final static boolean rearRightModuleIsDriveMotorReversed = false;
     public final static boolean rearRightModuleIsTurningMotorReversed = false;
+    public final static boolean rearRightModuleIsAbsoluteEcoderReversed = true;
+
 
     // Modules turning config
     //PID
@@ -79,7 +85,7 @@ public class SwerveConstants {
     public final static double theta_KD = 0;
 
     // swerve physics
-    public final static double maxVelocity = 4.96824;
-    public final static double maxAcceleration = 0;
+    public final static double maxVelocity = 4;//4.96824;
+    public final static double maxAcceleration = 3;
     public final static double maxAngularVelocity = maxVelocity / (0.61665 / 2); // radians
 }

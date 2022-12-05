@@ -23,6 +23,7 @@ public class SwerveModuleTalonFX extends SwerveModule{
 
     private final CANCoder absoluteEcoder;
 
+    private final boolean isAbsoluteEcoderReversed;
     private final double offsetEncoder;
 
     private final Shuffleboard board;
@@ -36,10 +37,12 @@ public class SwerveModuleTalonFX extends SwerveModule{
 
     public SwerveModuleTalonFX(String tabName, int driveID,
             int turningID, int absoluteEcoderID, boolean isDriveMotorReversed,
-            boolean isTurningMotorReversed, double offsetEncoder) {
+            boolean isTurningMotorReversed, boolean isAbsoluteEcoderReversed,
+            double offsetEncoder) {
         this.absoluteEcoder = new CANCoder(absoluteEcoderID);
 
         this.offsetEncoder = offsetEncoder;
+        this.isAbsoluteEcoderReversed = isAbsoluteEcoderReversed;
 
         this.board = new Shuffleboard(tabName);
 
@@ -105,7 +108,9 @@ public class SwerveModuleTalonFX extends SwerveModule{
     }
 
     public double getAbsoluteEncoderPosition() {
-        return absoluteEcoder.getAbsolutePosition();
+        return isAbsoluteEcoderReversed ?
+         360 - absoluteEcoder.getAbsolutePosition() :
+         absoluteEcoder.getAbsolutePosition();
     }
 
     public double getDrivePosition() {
@@ -132,9 +137,9 @@ public class SwerveModuleTalonFX extends SwerveModule{
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
-        turningMotor.setSelectedSensorPosition(0);
-            // (getAbsoluteEncoderPosition() - offsetEncoder) /
-            //             SwerveConstants.anglePerPulse);
+        turningMotor.setSelectedSensorPosition(
+            (getAbsoluteEncoderPosition() - offsetEncoder) /
+                        SwerveConstants.anglePerPulse);
     }
 
     public void turningMotorSetPower(double power) {

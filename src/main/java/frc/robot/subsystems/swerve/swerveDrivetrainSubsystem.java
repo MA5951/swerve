@@ -62,7 +62,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-      new Rotation2d(Math.toRadians(navx.getFusedHeading())));
+      new Rotation2d(Math.toRadians(navx.getYaw())));
 
   private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -71,6 +71,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.leftFrontAbsoluteEcoder,
       SwerveConstants.frontLeftModuleIsDriveMotorReversed,
       SwerveConstants.frontLeftModuleIsTurningMotorReversed,
+      SwerveConstants.frontLeftModuleIsAbsoluteEcoderReversed,
       SwerveConstants.frontLeftModuleOffsetEncoder);
 
   private final SwerveModule frontRightModule = new SwerveModuleTalonFX(
@@ -80,6 +81,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.rightFrontAbsoluteEcoder,
       SwerveConstants.frontRightModuleIsDriveMotorReversed,
       SwerveConstants.frontRightModuleIsTurningMotorReversed,
+      SwerveConstants.frontRightModuleIsAbsoluteEcoderReversed,
       SwerveConstants.frontRightModuleOffsetEncoder);
 
   private final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
@@ -89,6 +91,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.leftBackAbsoluteEcoder,
       SwerveConstants.rearLeftModuleIsDriveMotorReversed,
       SwerveConstants.rearLeftModuleIsTurningMotorReversed,
+      SwerveConstants.rearLeftModuleIsAbsoluteEcoderReversed,
       SwerveConstants.rearLeftModuleOffsetEncoder);
 
   private final SwerveModule rearRightModule = new SwerveModuleTalonFX(
@@ -98,6 +101,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.rightBackAbsoluteEcoder,
       SwerveConstants.rearRightModuleIsDriveMotorReversed,
       SwerveConstants.rearRightModuleIsTurningMotorReversed,
+      SwerveConstants.rearRightModuleIsAbsoluteEcoderReversed,
       SwerveConstants.rearRightModuleOffsetEncoder);
 
   /** Creates a new DrivetrainSubsystem. */
@@ -177,12 +181,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public void drive(double x, double y, double omega, boolean fieldRelative) {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
-            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, getRotation2d())
+            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, 
+            getRotation2d())
                 : new ChassisSpeeds(x, y, omega));
-    board.addNum("fld", states[3].angle.getDegrees());
-    board.addNum("frd", states[1].angle.getDegrees());
-    board.addNum("rld", states[2].angle.getDegrees());
-    board.addNum("rrd", states[0].angle.getDegrees());
     setModules(states);
   }
 
@@ -219,7 +220,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         thetaPID,
         this::setModules,
         eventsMap,
-        this)
+        this),
+      new InstantCommand(this::stop)
     );
   }
 
@@ -235,7 +237,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
     thetaPID.setPID(board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
     odometry.update(new Rotation2d(Math.toRadians(getFusedHeading())), frontLeftModule.getState(),
-        frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
+      frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
 
     board.addString("point", "(" + getPose().getX() + "," + getPose().getY() + ")");
     board.addNum("angle in degrees", getPose().getRotation().getDegrees());
