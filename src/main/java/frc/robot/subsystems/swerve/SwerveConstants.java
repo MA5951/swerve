@@ -4,6 +4,9 @@ public class SwerveConstants {
     // swerve constants
     public final static double width = 0.61665;
     public final static double length = 0.61665;
+    public final static double radius = Math.sqrt(
+        Math.pow(width, 2) + Math.pow(length, 2)
+    );
 
     // Modules constants
     private final static double turningGearRatio = 150d / 7;
@@ -86,6 +89,6 @@ public class SwerveConstants {
 
     // swerve physics
     public final static double maxVelocity = 4;//4.96824;
-    public final static double maxAcceleration = 3;
-    public final static double maxAngularVelocity = maxVelocity / (0.61665 / 2); // radians
+    public final static double maxAcceleration = Math.pow(maxVelocity, 2) / radius;
+    public final static double maxAngularVelocity = maxVelocity / radius; // radians
 }
