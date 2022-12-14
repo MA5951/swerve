@@ -7,6 +7,7 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class JoystickContainer {
 
     public static XboxController operatingJoystick = new XboxController(RobotConstants.KOPERATING_JOYSTICK_PORT);
-    public static XboxController drivingJoystick = new XboxController(RobotConstants.KDRIVING_JOYSTICK_PORT);
+    public static PS4Controller drivingJoystick = new PS4Controller(RobotConstants.KDRIVING_JOYSTICK_PORT);
     public static JoystickButton YButtonDrivingJoystick = new JoystickButton(drivingJoystick, RobotConstants.Y);
 
 

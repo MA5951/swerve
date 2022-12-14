@@ -35,6 +35,12 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public PIDController P_CONTROLLER_Y;
   public PIDController thetaPID;
 
+  public boolean isXReversed = true;
+  public boolean isYReversed = false;
+  public boolean isXYReversed = true;
+
+  private double offsetAngle = 0;
+
   private final String KP_X = "kp_x";
   private final String KP_Y = "kp_y";
   private final String theta_KP = "theta_KP";
@@ -62,7 +68,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-      new Rotation2d(Math.toRadians(navx.getYaw())));
+      new Rotation2d(Math.toRadians(navx.getFusedHeading())));
 
   private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -106,9 +112,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   /** Creates a new DrivetrainSubsystem. */
   public SwerveDrivetrainSubsystem() {
-    resetNavx();
+    navx.reset();
     this.board = new Shuffleboard("swerve");
-
     board.addNum(KP_X, SwerveConstants.KP_X);
 
     P_CONTROLLER_X = new PIDController(board.getNum(KP_X), 0, 0);
@@ -144,11 +149,11 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public Rotation2d getRotation2d() {
-    return new Rotation2d(Math.toRadians(getFusedHeading()));
+    return Rotation2d.fromDegrees(getFusedHeading());
   }
 
   public void resetNavx() {
-    navx.reset();
+    offsetAngle = getFusedHeading();
   }
 
   public Pose2d getPose() {
@@ -182,7 +187,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
             fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, 
-            getRotation2d())
+            getRotation2d().rotateBy(Rotation2d.fromDegrees(offsetAngle)))
                 : new ChassisSpeeds(x, y, omega));
     setModules(states);
   }
@@ -257,5 +262,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     board.addNum("rearLeft drive pose", rearLeftModule.getDrivePosition());
     board.addNum("frontRight drive pose", frontRightModule.getDrivePosition());
     board.addNum("rearRight drive pose", rearRightModule.getDrivePosition());
+
+    board.addBoolean("isCalibrating", navx.isCalibrating());
   }
 }
