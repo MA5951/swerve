@@ -106,7 +106,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   /** Creates a new DrivetrainSubsystem. */
   public SwerveDrivetrainSubsystem() {
-    resetNavx();
+    new Thread(
+      ()-> {
+        try {
+          Thread.sleep(1000);
+          resetNavx();
+        } catch (Exception e) {
+        }
+      }
+    ).start();
     this.board = new Shuffleboard("swerve");
 
     board.addNum(KP_X, SwerveConstants.KP_X);
@@ -140,7 +148,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return navx.getFusedHeading();
+    return navx.getAngle();
   }
 
   public Rotation2d getRotation2d() {
