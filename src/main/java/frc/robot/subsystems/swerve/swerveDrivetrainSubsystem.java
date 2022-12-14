@@ -6,6 +6,7 @@ package frc.robot.subsystems.swerve;
 
 import java.util.HashMap;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -55,13 +56,13 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.width / 2,
       -SwerveConstants.length / 2);
 
-  private final AHRS navx = new AHRS(Port.kOnboard);
+  private final AHRS navx = new AHRS(Port.kMXP);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-      new Rotation2d(Math.toRadians(navx.getFusedHeading())));
+      new Rotation2d(Math.toRadians(navx.getYaw())));
 
   private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -70,6 +71,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.leftFrontAbsoluteEcoder,
       SwerveConstants.frontLeftModuleIsDriveMotorReversed,
       SwerveConstants.frontLeftModuleIsTurningMotorReversed,
+      SwerveConstants.frontLeftModuleIsAbsoluteEcoderReversed,
       SwerveConstants.frontLeftModuleOffsetEncoder);
 
   private final SwerveModule frontRightModule = new SwerveModuleTalonFX(
@@ -79,6 +81,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.rightFrontAbsoluteEcoder,
       SwerveConstants.frontRightModuleIsDriveMotorReversed,
       SwerveConstants.frontRightModuleIsTurningMotorReversed,
+      SwerveConstants.frontRightModuleIsAbsoluteEcoderReversed,
       SwerveConstants.frontRightModuleOffsetEncoder);
 
   private final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
@@ -88,6 +91,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.leftBackAbsoluteEcoder,
       SwerveConstants.rearLeftModuleIsDriveMotorReversed,
       SwerveConstants.rearLeftModuleIsTurningMotorReversed,
+      SwerveConstants.rearLeftModuleIsAbsoluteEcoderReversed,
       SwerveConstants.rearLeftModuleOffsetEncoder);
 
   private final SwerveModule rearRightModule = new SwerveModuleTalonFX(
@@ -97,17 +101,12 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwervePortMap.rightBackAbsoluteEcoder,
       SwerveConstants.rearRightModuleIsDriveMotorReversed,
       SwerveConstants.rearRightModuleIsTurningMotorReversed,
+      SwerveConstants.rearRightModuleIsAbsoluteEcoderReversed,
       SwerveConstants.rearRightModuleOffsetEncoder);
 
   /** Creates a new DrivetrainSubsystem. */
   public SwerveDrivetrainSubsystem() {
-    new Thread(() -> {
-      try {
-        Thread.sleep(1000);
-        navx.reset();
-      } catch (Exception e) {
-      }
-    }).start();
+    resetNavx();
     this.board = new Shuffleboard("swerve");
 
     board.addNum(KP_X, SwerveConstants.KP_X);
@@ -126,12 +125,26 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
      board.getNum(theta_KI), board.getNum(theta_KD));
   }
 
-  public double getYaw() {
-    return Math.IEEEremainder(navx.getFusedHeading(), 360);
+  public void setNeutralMode(NeutralMode mode) {
+    frontLeftModule.setNeutralMode(mode);
+    frontRightModule.setNeutralMode(mode);
+    rearRightModule.setNeutralMode(mode);
+    rearLeftModule.setNeutralMode(mode);
+  }
+
+  public void resetEncoders() {
+    frontLeftModule.resetEncoders();
+    frontRightModule.resetEncoders();
+    rearLeftModule.resetEncoders();
+    rearRightModule.resetEncoders();
+  }
+
+  public double getFusedHeading() {
+    return navx.getFusedHeading();
   }
 
   public Rotation2d getRotation2d() {
-    return new Rotation2d(Math.toRadians(getYaw()));
+    return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
   public void resetNavx() {
@@ -159,16 +172,17 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   public void setModules(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.maxVelocity);
-    frontLeftModule.setDesiredState(states[0]);
+    frontLeftModule.setDesiredState(states[3]);
     frontRightModule.setDesiredState(states[1]);
     rearLeftModule.setDesiredState(states[2]);
-    rearRightModule.setDesiredState(states[3]);
+    rearRightModule.setDesiredState(states[0]);
   }
 
   public void drive(double x, double y, double omega, boolean fieldRelative) {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
-            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, getRotation2d())
+            fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, 
+            getRotation2d())
                 : new ChassisSpeeds(x, y, omega));
     setModules(states);
   }
@@ -206,7 +220,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
         thetaPID,
         this::setModules,
         eventsMap,
-        this)
+        this),
+      new InstantCommand(this::stop)
     );
   }
 
@@ -221,10 +236,26 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     P_CONTROLLER_X.setP(board.getNum(KP_X));
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
     thetaPID.setPID(board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
-    odometry.update(new Rotation2d(Math.toRadians(navx.getFusedHeading())), frontLeftModule.getState(),
-        frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
+    odometry.update(new Rotation2d(Math.toRadians(getFusedHeading())), frontLeftModule.getState(),
+      frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
 
     board.addString("point", "(" + getPose().getX() + "," + getPose().getY() + ")");
     board.addNum("angle in degrees", getPose().getRotation().getDegrees());
+    board.addNum("angle in radians", getPose().getRotation().getRadians());
+
+    board.addNum("cancoder frontLeft", frontLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder frontRight", frontRightModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder rearLeft", rearLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("cancoder rearRight", rearRightModule.getAbsoluteEncoderPosition());
+
+    board.addNum("frontLeft angle", frontLeftModule.getTurningPosition());
+    board.addNum("frontRight angle", frontRightModule.getTurningPosition());
+    board.addNum("rearLeft angle", rearLeftModule.getTurningPosition());
+    board.addNum("rearRight angle", rearRightModule.getTurningPosition());
+
+    board.addNum("frontLeft drive pose", frontLeftModule.getDrivePosition());
+    board.addNum("rearLeft drive pose", rearLeftModule.getDrivePosition());
+    board.addNum("frontRight drive pose", frontRightModule.getDrivePosition());
+    board.addNum("rearRight drive pose", rearRightModule.getDrivePosition());
   }
 }
