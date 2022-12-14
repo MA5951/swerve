@@ -27,8 +27,10 @@ public class swerveJoystickCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xSpeed = JoystickContainer.drivingJoystick.getRawAxis(1);
-    double ySpeed = -JoystickContainer.drivingJoystick.getRawAxis(0);
+    double xSpeed = JoystickContainer.drivingJoystick.getRawAxis(
+      SwerveDrivetrainSubsystem.getInstance().isXYReversed ? 1 : 0);
+    double ySpeed = -JoystickContainer.drivingJoystick.getRawAxis(
+      SwerveDrivetrainSubsystem.getInstance().isXYReversed ? 0 : 1);
     double turningSpeed = JoystickContainer.drivingJoystick.getRawAxis(2);
 
     xSpeed = Math.abs(xSpeed) < 0.05 ? 0 : xSpeed;
@@ -36,9 +38,11 @@ public class swerveJoystickCommand extends CommandBase {
     turningSpeed = Math.abs(turningSpeed) < 0.1 ? 0 : turningSpeed;
 
     xSpeed = xSpeed * 
-      SwerveConstants.maxVelocity;
+      SwerveConstants.maxVelocity * 
+      (SwerveDrivetrainSubsystem.getInstance().isXReversed ? -1 : 1);
     ySpeed = ySpeed * 
-      SwerveConstants.maxVelocity;
+      SwerveConstants.maxVelocity *
+      (SwerveDrivetrainSubsystem.getInstance().isYReversed ? -1 : 1);
     turningSpeed = turningSpeed * 
       SwerveConstants.maxAngularVelocity;
     
