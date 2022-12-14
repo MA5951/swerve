@@ -35,11 +35,16 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public PIDController P_CONTROLLER_Y;
   public PIDController thetaPID;
 
+  public boolean isXReversed = true;
+  public boolean isYReversed = false;
+  public boolean isXYReversed = true;
+
   private final String KP_X = "kp_x";
   private final String KP_Y = "kp_y";
   private final String theta_KP = "theta_KP";
   private final String theta_KI = "theta_KI";
   private final String theta_KD = "theta_KD";
+
 
   private final Shuffleboard board;
 
@@ -106,7 +111,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   /** Creates a new DrivetrainSubsystem. */
   public SwerveDrivetrainSubsystem() {
-    resetNavx();
+    new Thread(
+      ()-> {
+        try {
+          Thread.sleep(1000);
+          resetNavx();
+        } catch (Exception e) {
+        }
+      }
+    ).start();
     this.board = new Shuffleboard("swerve");
 
     board.addNum(KP_X, SwerveConstants.KP_X);

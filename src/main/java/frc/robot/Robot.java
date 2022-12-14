@@ -8,8 +8,10 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.swerveJoystickCommand;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 
@@ -23,6 +25,10 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private final String S_isXReversed = "isXReversed";
+  private final String S_isYReversed = "isYReversed";
+  private final String S_isXYReversed = "isXYReversed";
+  private final String S_TabName = "Commands";
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,6 +39,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    Shuffleboard.getTab(S_TabName).add(S_isXReversed, new InstantCommand(()-> SwerveDrivetrainSubsystem.getInstance().isXReversed = !SwerveDrivetrainSubsystem.getInstance().isXReversed));
+    Shuffleboard.getTab(S_TabName).add(S_isYReversed, new InstantCommand(()-> SwerveDrivetrainSubsystem.getInstance().isYReversed = !SwerveDrivetrainSubsystem.getInstance().isYReversed));
+    Shuffleboard.getTab(S_TabName).add(S_isXYReversed, new InstantCommand(()-> SwerveDrivetrainSubsystem.getInstance().isXYReversed = !SwerveDrivetrainSubsystem.getInstance().isXYReversed));
   }
 
   /**
