@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 import frc.robot.utils.JoystickContainer.MA_Ps5Controller;
-import frc.robot.utils.JoystickContainer.MA_PsVibrations;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,7 +35,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     controller.CrossButton.whileActiveContinuous(
-      new InstantCommand(()->controller.psVibrations(3, 1, 500, true));
+      new InstantCommand(()->controller.psVibrations(3, 1, 500, true))
+    );
+
+    controller.TriangleButton.whenPressed(
+      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::resetNavx)
     );
   }
 
