@@ -148,7 +148,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return navx.getAngle();
+    return navx.getFusedHeading();
   }
 
   public Rotation2d getRotation2d() {

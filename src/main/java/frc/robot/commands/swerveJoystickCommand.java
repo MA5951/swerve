@@ -7,7 +7,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
-import frc.robot.utils.JoystickContainer;
 
 public class swerveJoystickCommand extends CommandBase {
   /** Creates a new swerveJoystickCommand. */
@@ -27,9 +26,9 @@ public class swerveJoystickCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xSpeed = JoystickContainer.drivingJoystick.getRawAxis(1);
-    double ySpeed = -JoystickContainer.drivingJoystick.getRawAxis(0);
-    double turningSpeed = JoystickContainer.drivingJoystick.getRawAxis(2);
+    double xSpeed = 0;
+    double ySpeed = 0;
+    double turningSpeed = 0;
 
     xSpeed = Math.abs(xSpeed) < 0.05 ? 0 : xSpeed;
     ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed;

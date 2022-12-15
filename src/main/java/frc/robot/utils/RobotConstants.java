@@ -21,6 +21,8 @@ public class RobotConstants {
         forward, reverse
     }
 
+    public static int ID1 = 1, ID2 = 2, ID3 = 3, ID4 = 4, ID5 = 5, ID6 = 6, ID7 = 7, ID8 = 8, ID9 = 9, ID10 = 10,
+            ID11 = 11, ID12 = 12, ID13 = 13, ID14 = 14, ID15 = 15, ID16 = 16;
 
     public final static boolean KMOTOR_BRAKE = true;
     public final static boolean KMOTOR_COAST = false;
@@ -48,10 +50,9 @@ public class RobotConstants {
     public final static double KDELTA_TIME = 0.020;
     public final static double KGRAVITY_ACCELERATION = 9.82;
 
-    // public final static int KLEFT_JOYSTICK_PORT = 0;
-    // public final static int KRIGHT_JOYSTICK_PORT = 1;
-    public final static int KOPERATING_JOYSTICK_PORT = 1;
-    public final static int KDRIVING_JOYSTICK_PORT = 0;
+    public final static int KLEFT_JOYSTICK_PORT = 0;
+    public final static int KRIGHT_JOYSTICK_PORT = 1;
+    public final static int KOPERATING_JOYSTICK_PORT = 2;
 
     public final static int KTRIGGER_THRESHOLD_TIME = 0;
 
@@ -89,6 +90,22 @@ public class RobotConstants {
     public static final int STICK_LEFT = 9;
     public static final int STICK_RIGHT = 10;
 
+    //PS5 BUTTONS
+    public static final int cross = 2;
+    public static final int circle = 3;
+    public static final int square = 1;
+    public static final int triangle = 4;
+    public static final int L1 = 5;
+    public static final int R1 = 6;
+    public static final int L2 = 7;
+    public static final int R2 = 8;
+    public static final int share = 9;
+    public static final int options = 10;
+    public static final int L3 = 11;
+    public static final int R3 = 12;
+    public static final int PS = 13;
+    public static final int touchpad = 14;
+
     // axis
     public static final int STICK_RIGHT_Y_AXIS = 5; // TODO
     public static final int STICK_RIGHT_X_AXIS = 4; // TODO
@@ -96,6 +113,14 @@ public class RobotConstants {
     public static final int STICK_LEFT_X_AXIS = 2; // TODO
     public static final int L_TRIGER = 2; // TODO
     public static final int R_TRIGER = 3; // TODO
+
+    // PS5 axis
+    public static final int Left_stick_X = 0;
+    public static final int Right_stick_x = 2;
+    public static final int Left_stick_Y = 1;
+    public static final int Right_stick_y = 5;
+    public static final int PS_L2 = 3;
+    public static final int PS_R2 = 4;
 
     // POV
     public static final int POV_CENTER = -1;

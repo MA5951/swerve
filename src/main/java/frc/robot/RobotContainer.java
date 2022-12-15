@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
-import frc.robot.utils.JoystickContainer;
+import frc.robot.utils.JoystickContainer.MA_Ps5Controller;
+import frc.robot.utils.JoystickContainer.MA_PsVibrations;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -19,6 +20,7 @@ import frc.robot.utils.JoystickContainer;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  public MA_Ps5Controller controller = new MA_Ps5Controller(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -33,9 +35,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickContainer.YButtonDrivingJoystick.whenPressed(
-      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::resetNavx)
-      );
+    controller.CrossButton.whileActiveContinuous(
+      new InstantCommand(()->controller.psVibrations(3, 1, 500, true));
+    );
   }
 
   /**
