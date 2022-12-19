@@ -13,15 +13,12 @@ import frc.robot.utils.JoystickContainer;
 public class swerveJoystickCommand extends CommandBase {
   /** Creates a new swerveJoystickCommand. */
   private final SwerveDrivetrainSubsystem swerve;
-  private final SlewRateLimiter rateLimiterX;
-  private final SlewRateLimiter rateLimiterY;
-  private final SlewRateLimiter rateLimiterTurning;
-  //private final SlewRateLimiter xRateLimiter, yRateLimiter, turningRateLimiter;
+  private final SlewRateLimiter xRateLimiter, yRateLimiter, turningRateLimiter;
   public swerveJoystickCommand() {
     swerve = SwerveDrivetrainSubsystem.getInstance();
-    rateLimiterX = new SlewRateLimiter(2.5);
-    rateLimiterY = new SlewRateLimiter(2.5);
-    rateLimiterTurning = new SlewRateLimiter(2.5);
+    xRateLimiter = new SlewRateLimiter(0.9);
+    yRateLimiter = new SlewRateLimiter(0.9);
+    turningRateLimiter = new SlewRateLimiter(0.8);
     addRequirements(swerve);
   }
 
@@ -34,14 +31,14 @@ public class swerveJoystickCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double xSpeed = rateLimiterX.calculate(JoystickContainer.drivingJoystick.getRawAxis(
+    double xSpeed = xRateLimiter.calculate(JoystickContainer.drivingJoystick.getRawAxis(
       SwerveDrivetrainSubsystem.getInstance().isXYReversed ? 1 : 0));
-    double ySpeed = rateLimiterY.calculate(JoystickContainer.drivingJoystick.getRawAxis(
+    double ySpeed = yRateLimiter.calculate(JoystickContainer.drivingJoystick.getRawAxis(
       SwerveDrivetrainSubsystem.getInstance().isXYReversed ? 0 : 1));
-    double turningSpeed = rateLimiterTurning.calculate(
+    double turningSpeed = turningRateLimiter.calculate(
       JoystickContainer.drivingJoystick.getRawAxis(2));
 
-    xSpeed = Math.abs(xSpeed) < 0.05 ? 0 : xSpeed;
+    xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : xSpeed;
     ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed;
     turningSpeed = Math.abs(turningSpeed) < 0.1 ? 0 : turningSpeed;
 
