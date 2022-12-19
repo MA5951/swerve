@@ -49,7 +49,7 @@ public abstract class SwerveModule {
         turningMotorSetPower(0);
     }
 
-    public static SwerveModuleState optimize(SwerveModuleState desiredState, 
+    private static SwerveModuleState optimize(SwerveModuleState desiredState, 
     double currentAngle, double currV) {
         // desired angle diff in [-360, +360]
         double _angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
