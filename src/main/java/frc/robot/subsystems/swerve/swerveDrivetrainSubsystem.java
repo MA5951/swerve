@@ -67,7 +67,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       rearLeftLocation, rearRightLocation);
 
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics,
-      new Rotation2d(Math.toRadians(navx.getYaw())));
+    new Rotation2d(0));
 
   private final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -153,7 +153,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return navx.getFusedHeading();
+    return navx.getYaw();
   }
 
   public Rotation2d getRotation2d() {
@@ -161,7 +161,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public void resetNavx() {
-    navx.reset();
+    navx.zeroYaw();
   }
 
   public Pose2d getPose() {
@@ -195,7 +195,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     SwerveModuleState[] states = kinematics
         .toSwerveModuleStates(
             fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega, 
-            getRotation2d())
+            new Rotation2d(Math.toRadians(getFusedHeading())))
                 : new ChassisSpeeds(x, y, omega));
     setModules(states);
   }
@@ -249,7 +249,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     P_CONTROLLER_X.setP(board.getNum(KP_X));
     P_CONTROLLER_Y.setP(board.getNum(KP_Y));
     thetaPID.setPID(board.getNum(theta_KP), board.getNum(theta_KI), board.getNum(theta_KD));
-    odometry.update(new Rotation2d(Math.toRadians(getFusedHeading())), frontLeftModule.getState(),
+    odometry.update(getRotation2d(), frontLeftModule.getState(),
       frontRightModule.getState(), rearLeftModule.getState(), rearRightModule.getState());
 
     board.addString("point", "(" + getPose().getX() + "," + getPose().getY() + ")");
