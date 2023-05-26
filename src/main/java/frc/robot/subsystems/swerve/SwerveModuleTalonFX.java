@@ -7,10 +7,10 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import frc.robot.utils.Shuffleboard;
 
 /** Add your docs here. */
 public class SwerveModuleTalonFX extends SwerveModule{
@@ -19,32 +19,21 @@ public class SwerveModuleTalonFX extends SwerveModule{
     private final TalonFX turningMotor;
 
     private final SimpleMotorFeedforward feedforward  = 
-        new SimpleMotorFeedforward(SwerveConstants.driveKS, SwerveConstants.driveKV);
+        new SimpleMotorFeedforward(SwerveConstants.DRIVE_KS, SwerveConstants.DRIVE_KV);
 
     private final CANCoder absoluteEcoder;
 
-    private final boolean isAbsoluteEcoderReversed;
+    private final boolean isAbsoluteEncoderReversed;
     private final double offsetEncoder;
 
-    private final Shuffleboard board;
-    private final String driveKP = "driveKP";
-    private final String driveKI = "driveKI";
-    private final String driveKD = "driveKD";
-
-    private final String turningKP = "turningKP";
-    private final String turningKI = "turningKI";
-    private final String turningKD = "turningKD";
-
     public SwerveModuleTalonFX(String tabName, int driveID,
-            int turningID, int absoluteEcoderID, boolean isDriveMotorReversed,
-            boolean isTurningMotorReversed, boolean isAbsoluteEcoderReversed,
+            int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
+            boolean isTurningMotorReversed, boolean isAbsoluteEncoderReversed,
             double offsetEncoder) {
-        this.absoluteEcoder = new CANCoder(absoluteEcoderID);
+        this.absoluteEcoder = new CANCoder(absoluteEncoderID);
 
         this.offsetEncoder = offsetEncoder;
-        this.isAbsoluteEcoderReversed = isAbsoluteEcoderReversed;
-
-        this.board = new Shuffleboard(tabName);
+        this.isAbsoluteEncoderReversed = isAbsoluteEncoderReversed;
 
         this.driveMotor = new TalonFX(driveID);
         this.turningMotor = new TalonFX(turningID);
@@ -59,27 +48,22 @@ public class SwerveModuleTalonFX extends SwerveModule{
         configDriveMotor();
         resetEncoders();
 
-        board.addNum(driveKP, SwerveConstants.drivePIDKP);
-        board.addNum(driveKI, SwerveConstants.drivePIDKI);
-        board.addNum(driveKD, SwerveConstants.drivePIDKD);
-
-        board.addNum(turningKP, SwerveConstants.turningPIDKP);
-        board.addNum(turningKI, SwerveConstants.turningPIDKI);
-        board.addNum(turningKD, SwerveConstants.turningPIDKD);
+        absoluteEcoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 15000);
+        absoluteEcoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 15000);
     }
 
     private void configTurningMotor() {
         TalonFXConfiguration turningConfiguration = new TalonFXConfiguration();
 
-        turningConfiguration.slot0.kP = SwerveConstants.turningPIDKP;
-        turningConfiguration.slot0.kI = SwerveConstants.turningPIDKI;
-        turningConfiguration.slot0.kD = SwerveConstants.turningPIDKD;
+        turningConfiguration.slot0.kP = SwerveConstants.TURNING_PIDKP;
+        turningConfiguration.slot0.kI = SwerveConstants.TURNING_PIDKI;
+        turningConfiguration.slot0.kD = SwerveConstants.TURNING_PIDKD;
         turningConfiguration.slot0.kF = 0;
         turningConfiguration.supplyCurrLimit = new SupplyCurrentLimitConfiguration(
-                SwerveConstants.turningEnableCurrentLimit,
-                SwerveConstants.turningContinuousCurrentLimit,
-                SwerveConstants.turningPeakCurrentLimit,
-                SwerveConstants.turningPeakCurrentDuration);
+                SwerveConstants.TURING_ENABLE_CURRENT_LIMIT,
+                SwerveConstants.TURNING_CONTINUOUS_CURRENT_LIMIT,
+                SwerveConstants.TURNING_PEAK_CURRENT_LIMIT,
+                SwerveConstants.TURNING_PEAK_CURRENT_DURATION);
         turningConfiguration.initializationStrategy = SensorInitializationStrategy.BootToZero;
         turningMotor.configAllSettings(turningConfiguration);
     }
@@ -87,18 +71,18 @@ public class SwerveModuleTalonFX extends SwerveModule{
     private void configDriveMotor() {
         TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
 
-        driveConfiguration.slot0.kP = SwerveConstants.drivePIDKP;
-        driveConfiguration.slot0.kI = SwerveConstants.drivePIDKI;
-        driveConfiguration.slot0.kD = SwerveConstants.drivePIDKD;
+        driveConfiguration.slot0.kP = SwerveConstants.DRIVE_PID_KP;
+        driveConfiguration.slot0.kI = SwerveConstants.DRIVE_PID_KI;
+        driveConfiguration.slot0.kD = SwerveConstants.DRIVE_PID_KD;
         driveConfiguration.slot0.kF = 0;
         driveConfiguration.supplyCurrLimit = new SupplyCurrentLimitConfiguration(
-                SwerveConstants.driveEnableCurrentLimit,
-                SwerveConstants.driveContinuousCurrentLimit,
-                SwerveConstants.drivePeakCurrentLimit,
-                SwerveConstants.drivePeakCurrentDuration);
+                SwerveConstants.DRIVE_ENBLE_CURRENT_LIMIT,
+                SwerveConstants.DRIVE_CONTINUOS_CURRENT_LIMIT,
+                SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT,
+                SwerveConstants.DRIVE_PEAK_CURRENT_DURATION);
         driveConfiguration.initializationStrategy = SensorInitializationStrategy.BootToZero;
-        driveConfiguration.openloopRamp = SwerveConstants.openloopRamp;
-        driveConfiguration.closedloopRamp = SwerveConstants.closedloopRamp;
+        driveConfiguration.openloopRamp = SwerveConstants.OPEN_LOOP_RAMP;
+        driveConfiguration.closedloopRamp = SwerveConstants.CLOSED_LOOP_RAMP;
 
         driveMotor.configAllSettings(driveConfiguration);
     }
@@ -108,38 +92,38 @@ public class SwerveModuleTalonFX extends SwerveModule{
     }
 
     public double getAbsoluteEncoderPosition() {
-        return isAbsoluteEcoderReversed ?
+        return isAbsoluteEncoderReversed ?
          360 - absoluteEcoder.getAbsolutePosition() :
          absoluteEcoder.getAbsolutePosition();
     }
 
     public double getDrivePosition() {
         return driveMotor.getSelectedSensorPosition()
-                * SwerveConstants.distancePerPulse;
+                * SwerveConstants.DISTANCE_PER_PULSE;
     }
 
     public double getTurningPosition() {
         return turningMotor.getSelectedSensorPosition()
-                * SwerveConstants.anglePerPulse;
+                * SwerveConstants.ANGLE_PER_PULSE;
     }
 
     public double getDriveVelocity() {
         return (driveMotor.getSelectedSensorVelocity()
-                * SwerveConstants.distancePerPulse) /
-                SwerveConstants.velocityTimeUnitInSeconds;
+                * SwerveConstants.DISTANCE_PER_PULSE) /
+                SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS;
     }
 
     public double getTurningVelocity() {
         return (turningMotor.getSelectedSensorVelocity()
-                * SwerveConstants.anglePerPulse) /
-                SwerveConstants.velocityTimeUnitInSeconds;
+                * SwerveConstants.ANGLE_PER_PULSE) /
+                SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS;
     }
 
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
         turningMotor.setSelectedSensorPosition(
             (getAbsoluteEncoderPosition() - offsetEncoder) /
-                        SwerveConstants.anglePerPulse);
+                        SwerveConstants.ANGLE_PER_PULSE);
     }
 
     public void turningMotorSetPower(double power) {
@@ -150,23 +134,19 @@ public class SwerveModuleTalonFX extends SwerveModule{
         driveMotor.set(ControlMode.PercentOutput, power);
     }
 
+    public void setInvertedTurning(Boolean turningMode) {
+        turningMotor.setInverted(turningMode);
+    }
+
     public void turningUsingPID(double setPoint) {
-        turningMotor.config_kP(0, board.getNum(turningKP));
-        turningMotor.config_kI(0, board.getNum(turningKI));
-        turningMotor.config_kD(0, board.getNum(turningKD));
-        board.addNum("Turning Position", getTurningPosition());
         turningMotor.set(ControlMode.Position, setPoint /
-                SwerveConstants.anglePerPulse);
+                SwerveConstants.ANGLE_PER_PULSE);
     }
 
     public void driveUsingPID(double setPoint) {
-        driveMotor.config_kP(0, board.getNum(driveKP));
-        driveMotor.config_kI(0, board.getNum(driveKI));
-        driveMotor.config_kD(0, board.getNum(driveKD));
-        board.addNum("Drive Velocity", getDriveVelocity());
         driveMotor.set(ControlMode.Velocity,
-                setPoint / SwerveConstants.distancePerPulse *
-                        SwerveConstants.velocityTimeUnitInSeconds, 
+                setPoint / SwerveConstants.DISTANCE_PER_PULSE *
+                        SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS, 
                         DemandType.ArbitraryFeedForward,
                         feedforward.calculate(setPoint));
     }

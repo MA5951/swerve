@@ -4,12 +4,20 @@
 
 package frc.robot;
 
+import com.ma5951.utils.PhotonVision;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
-import frc.robot.utils.JoystickContainer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,11 +26,37 @@ import frc.robot.utils.JoystickContainer;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  public static final CommandPS4Controller DRIVER_PS4_CONTROLLER = 
+    new CommandPS4Controller(OperatorConstants.DRIVER_CONTROLLER_PORT);
+
+  private static AprilTagFieldLayout aprilTagFieldLayout;
+
+  public static PhotonVision photonVision;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
+    try {
+      aprilTagFieldLayout = 
+        AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+
+    photonVision  = new PhotonVision(
+      "ma5951",
+      new Transform3d(
+       new Translation3d(
+        Constants.Camera.CAMERA_DISTANCE_FROM_CENTER_IN_X,
+        Constants.Camera.CAMERA_DISTANCE_FROM_CENTER_IN_Y,
+        Constants.Camera.CAMERA_DISTANCE_FROM_CENTER_IN_Z
+       ), new Rotation3d(
+        Constants.Camera.CAMERA_ROLL,
+        Constants.Camera.CAMERA_PITCH,
+        Constants.Camera.CAMERA_YAW
+       )),
+      aprilTagFieldLayout
+    );
     configureButtonBindings();
   }
 
@@ -33,9 +67,11 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    JoystickContainer.YButtonDrivingJoystick.whenPressed(
-      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::resetNavx)
-      );
+    DRIVER_PS4_CONTROLLER.triangle().whileTrue(
+      new InstantCommand(
+        SwerveDrivetrainSubsystem.getInstance()::updateOffset
+      )
+    );
   }
 
   /**
